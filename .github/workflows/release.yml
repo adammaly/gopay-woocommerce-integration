@@ -22,14 +22,7 @@ jobs:
 
       - name: Package plugin
         run: |
-          mkdir -p gopay-gateway
-          rsync -av --exclude='gopay-gateway' \
-                    --exclude='.git*' \
-                    --exclude='.github' \
-                    --exclude='composer.json' \
-                    --exclude='composer.lock' \
-                    . gopay-gateway/
-          zip -r gopay-gateway-${{ github.ref_name }}.zip gopay-gateway
+          zip -r gopay-gateway-${{ github.ref_name }}.zip .
 
       - name: Release
         uses: softprops/action-gh-release@v2
