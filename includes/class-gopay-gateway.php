@@ -580,11 +580,16 @@ function init_gopay_gateway_gateway() {
 
 			// Inline.
 			$get = wp_unslash( $_GET );
-			if ( ! empty( $get['gopay_url'] ) && ! empty( $get['_wpnonce'] ) &&
-				wp_verify_nonce( $get['_wpnonce'], 'gw_url' ) ) {
-				echo wp_kses( '<script>_gopay.checkout({gatewayUrl: "' . esc_url( $get['gopay_url'] ) . '", inline: true});</script>',
-                array( 'script' => array() ) );
-			}
+            add_action( 'wp_print_footer_scripts', function() {
+                if ( isset( $_GET['gopay_url'], $_GET['_wpnonce'] )
+                    && wp_verify_nonce( $_GET['_wpnonce'], 'gw_url' )
+                ) {
+                    echo wp_kses(
+                        '<script>_gopay.checkout({gatewayUrl: "' . esc_url( $_GET['gopay_url'] ) . '", inline: true});</script>',
+                        [ 'script' => [] ]
+                    );
+                }
+            }, 20 );
 			// end Inline.
 
 			if ( ! empty( WC()->customer ) ) {

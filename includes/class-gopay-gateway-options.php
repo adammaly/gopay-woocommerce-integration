@@ -366,32 +366,65 @@ class Gopay_Gateway_Options {
 	 * @return array
 	 */
 	public static function supported_shipping_methods(): array {
+        // Only in admin context.
+        if ( ! is_admin() ) {
+            if ( ! isset ( $_REQUEST['page'] ) || 'wc-settings' !== $_REQUEST['page'] ) {
+                return array();
+            }
+            if ( ! isset ( $_REQUEST['tab'] ) || 'checkout' !== $_REQUEST['tab'] ) {
+                return array();
+            }
+            if ( ! isset ( $_REQUEST['section'] ) || 'wc_gopay_gateway' !== $_REQUEST['section'] ) {
+                return array();
+            }
+        }
+
 		if ( empty( WC()->countries ) ) {
 			return array();
 		}
 
-		// Get all shipping zones
-		$shipping_zones = WC_Shipping_Zones::get_zones();
-		$all_enabled_shipping_methods = array();
-	
-		foreach ($shipping_zones as $zone_data) {
-			$zone = WC_Shipping_Zones::get_zone($zone_data['zone_id']);
-	
-			// Get enabled shipping methods for zone
-			$enabled_shipping_methods = $zone->get_shipping_methods(true);
-	
-			foreach ($enabled_shipping_methods as $shipping_method) {
-				// Check if the method is already added
-				if (!isset($all_enabled_shipping_methods[$shipping_method->id])) {
-					$all_enabled_shipping_methods[$shipping_method->id] = __(
-						$shipping_method->get_method_title(),
-						'gopay-gateway'
-					);
-				}
-			}
-		}
-	
-		return $all_enabled_shipping_methods;
+        $data_store = WC_Data_Store::load( 'shipping-zone' );
+        $raw_zones  = $data_store->get_zones();
+        $zones      = array();
+
+        foreach ( $raw_zones as $raw_zone ) {
+            $zones[] = new WC_Shipping_Zone( $raw_zone );
+        }
+
+        $zones[] = new WC_Shipping_Zone( 0 );
+
+        $options = array();
+        foreach ( WC()->shipping()->load_shipping_methods() as $method ) {
+
+            $options[ $method->get_method_title() ] = array();
+
+            // Translators: %1$s shipping method name.
+            $options[ $method->get_method_title() ][ $method->id ] = sprintf( __( 'Any &quot;%1$s&quot; method', 'woocommerce' ), $method->get_method_title() );
+
+            foreach ( $zones as $zone ) {
+
+                $shipping_method_instances = $zone->get_shipping_methods();
+
+                foreach ( $shipping_method_instances as $shipping_method_instance_id => $shipping_method_instance ) {
+
+                    if ( $shipping_method_instance->id !== $method->id ) {
+                        continue;
+                    }
+
+                    $option_id = $shipping_method_instance->get_rate_id();
+
+                    // Translators: %1$s shipping method title, %2$s shipping method id.
+                    $option_instance_title = sprintf( __( '%1$s (#%2$s)', 'woocommerce' ), $shipping_method_instance->get_title(), $shipping_method_instance_id );
+
+                    // Translators: %1$s zone name, %2$s shipping method instance name.
+                    $option_title = sprintf( __( '%1$s &ndash; %2$s', 'woocommerce' ), $zone->get_id() ? $zone->get_zone_name() : __( 'Other locations', 'woocommerce' ), $option_instance_title );
+
+                    $options[ $method->get_method_title() ][ $option_id ] = $option_title;
+                }
+            }
+        }
+
+        return $options;
 	}
 
 	/**
