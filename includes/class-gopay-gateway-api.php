@@ -177,6 +177,10 @@ class Gopay_Gateway_API {
 				'name'  => 'invoicenumber',
 				'value' => $order->get_order_number(),
 			),
+			array(
+				'name'  => 'gopay_plugin',
+				'value' => 'gopay-woocommerce',
+			),
 		);
 
 		$language = Gopay_Gateway_Options::country_to_language()[ $order->get_billing_country() ];

@@ -613,17 +613,25 @@ function init_gopay_gateway_gateway() {
 				}
 				// end check currency.
 
-				// Check if all products are both virtual and downloadable.
+				// Check if all products are virtual and/or downloadable.
 				$all_virtual_downloadable = true;
+				$all_virtual = true;
+
 				foreach ( WC()->cart->get_cart() as $item ) {
 					$product = $item["data"];
+					if ( ! $product->is_virtual() ) {
+						$all_virtual = false;
+					}
 					if ( ! $product->is_virtual() || ! $product->is_downloadable() ) {
 						$all_virtual_downloadable = false;
+					}
+					
+					if ( !$all_virtual && !$all_virtual_downloadable ) {
 						break;
 					}
 				}
 
-				if ( $all_virtual_downloadable ) {
+				if ( $all_virtual_downloadable || $all_virtual ) {
 					return parent::is_available();
 				}
 				// end check virtual or downloadable.

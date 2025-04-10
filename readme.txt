@@ -4,7 +4,7 @@ Tags: WooCommerce, GoPay
 Requires at least: 5.8
 Tested up to: 6.7.1
 Requires PHP: 8.1
-Stable tag: 1.0.14
+Stable tag: 1.0.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,3 +106,6 @@ Introduced new payment methods: Twisto and Skip Pay. The checkout payment method
 
 = 1.0.14 =
 Updated supported WordPress version to v6.7.1 and WooCommerce to v9.6.1.
+
+= 1.0.15 =
+Add extra API parameters and fix an issue that, in certain cases, prevents virtual products from being added to checkout.
