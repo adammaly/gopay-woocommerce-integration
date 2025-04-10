@@ -742,7 +742,7 @@ function init_gopay_gateway_gateway() {
 						'_input" name="gopay_payment_method" type="radio" id="%s" value="%s" %s />
 					    <span>%s</span>
 					</div>
-					<img src="%s" alt="ico" style="height: auto; width: auto; margin-left: auto;"/>
+					<img src="%s" alt="ico" style="max-height: 120px; height: auto; width: auto; margin-left: auto;"/>
 					</div>';
 
 				foreach ( $payment_methods as $payment_method => $payment_method_label_image ) {
