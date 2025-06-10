@@ -204,17 +204,19 @@ class Gopay_Gateway_Subscriptions {
 	 * @return bool
 	 * @since  1.0.0
 	 */
-	public static function cart_contains_subscription(): bool {
-		foreach ( WC()->cart->get_cart() as $item ) {
-			$product = wc_get_product( $item['product_id'] );
-			if ( class_exists( 'WC_Subscriptions_Product' ) &&
-				WC_Subscriptions_Product::is_subscription( $product ) ) {
-				return true;
-			}
-		}
+    public static function cart_contains_subscription(): bool {
+        // Kontrola, zda WC() a košík existují
+        if (!function_exists('WC') || is_null(WC()) || is_null(WC()->cart)) {
+            return false;
+        }
 
-		return false;
-	}
+        // Původní kód pro kontrolu předplatného
+        if (class_exists('WC_Subscriptions_Cart')) {
+            return WC_Subscriptions_Cart::cart_contains_subscription();
+        }
+
+        return false;
+    }
 
 	/**
 	 * Process subscription payment when triggered
