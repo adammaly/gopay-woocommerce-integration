@@ -44,7 +44,7 @@ function init_gopay_gateway_gateway() {
         private $client_secret;
         private $test;
         private $instructions;
-        private $simplified_bank_selection;
+        public $simplified_bank_selection;
         private $payment_retry;
         private $enable_countries;
         private $enable_gopay_payment_methods;
@@ -820,7 +820,7 @@ function init_gopay_gateway_gateway() {
 		 *
 		 * @since  1.0.0
 		 */
-		public function process_payment( $order_id ): array {
+		public function process_payment( $order_id): array {
 			$order = wc_get_order( $order_id );
 			$order->set_status( 'pending' );
 			$order->save();
@@ -876,6 +876,16 @@ function init_gopay_gateway_gateway() {
 			// GoPay API only considers cents.
 			// Rounding total to 2 decimals.
 			$order->set_total( wc_format_decimal( $order->get_total(), 2 ) );
+
+
+// Zkusit získat z $_POST
+            if (isset($_POST['gopay_payment_method'])) {
+                $gopay_payment_method = sanitize_text_field($_POST['gopay_payment_method']);
+            }
+// Zkusit získat z requestu
+            elseif (isset($_REQUEST['payment_data']) && isset($_REQUEST['payment_data']['gopay_payment_method'])) {
+                $gopay_payment_method = sanitize_text_field($_REQUEST['payment_data']['gopay_payment_method']);
+            }
 
 			$response = Gopay_Gateway_API::create_payment(
 				$gopay_payment_method,
