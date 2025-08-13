@@ -8,7 +8,6 @@ const { __ } = window.wp.i18n;
 const settings = getSetting('gopay_data', {});
 
 // Funkce pro kontrolu dostupnosti Apple Pay
-// Funkce pro kontrolu dostupnosti Apple Pay
 const checkApplePayAvailability = () => {
 	let applePayAvailable = false;
 	if (window.ApplePaySession && window.ApplePaySession.canMakePayments()) {
